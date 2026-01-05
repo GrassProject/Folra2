@@ -1,0 +1,148 @@
+package com.github.grassproject.folra.item
+
+import com.github.grassproject.folra.annotation.FolraDsl
+import com.github.grassproject.folra.item.option.*
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import org.bukkit.Color
+import org.bukkit.Material
+import org.bukkit.entity.EntityType
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemRarity
+import org.bukkit.inventory.ItemStack
+
+@FolraDsl
+class StackedItemBuilder(private val baseStack: ItemStack) {
+
+    private val options = mutableMapOf<Class<out ItemOptionHandle>, ItemOptionHandle>()
+
+    var amount: Int = 1
+        set(value) {
+            options[AmountOptionHandle::class.java] = AmountOptionHandle(value)
+            field = value
+        }
+
+    var displayName: Component? = null
+        set(value) {
+            value?.let { options[DisplayNameOptionHandle::class.java] = DisplayNameOptionHandle(it) }
+            field = value
+        }
+
+    val lore = mutableListOf<Component>()
+
+    var customModelDataLegacy: Int? = null
+        set(value) {
+            value?.let { options[CustomModelDataLegacyOptionHandle::class.java] = CustomModelDataLegacyOptionHandle(it) }
+            field = value
+        }
+
+    fun customModelData(builder: CustomModelDataBuilder.() -> Unit) {
+        val dataBuilder = CustomModelDataBuilder().apply(builder)
+        options[CustomModelDataOptionHandle::class.java] = dataBuilder.build()
+    }
+
+    var itemModel: Key? = null
+        set(value) {
+            value?.let { options[ItemModelOptionHandle::class.java] = ItemModelOptionHandle(it) }
+            field = value
+        }
+
+    var damage: Int? = null
+        set(value) {
+            value?.let { options[DamageOptionHandle::class.java] = DamageOptionHandle(it) }
+            field = value
+        }
+
+    var maxDamage: Int? = null
+        set(value) {
+            value?.let { options[MaxDamageOptionHandle::class.java] = MaxDamageOptionHandle(it) }
+            field = value
+        }
+
+    var maxStackSize: Int? = null
+        set(value) {
+            value?.let { options[MaxStackSizeOptionHandle::class.java] = MaxStackSizeOptionHandle(it) }
+            field = value
+        }
+
+    var unbreakable: Boolean = false
+        set(value) {
+            if (!value) {
+                options -= UnbreakableOptionHandle::class.java
+            } else {
+                options[UnbreakableOptionHandle::class.java] = UnbreakableOptionHandle()
+            }
+            field = value
+        }
+
+    var rarity: ItemRarity? = null
+        set(value) {
+            value?.let { options[RarityOptionHandle::class.java] = RarityOptionHandle(it) }
+            field = value
+        }
+
+    var spawnerType: EntityType? = null
+        set(value) {
+            value?.let { options[SpawnerTypeOptionHandle::class.java] = SpawnerTypeOptionHandle(it) }
+            field = value
+        }
+
+    var tooltipStyle: Key? = null
+        set(value) {
+            value?.let { options[TooltipStyleOptionHandle::class.java] = TooltipStyleOptionHandle(it) }
+            field = value
+        }
+
+    var dyeColor: Color? = null
+        set(value) {
+            value?.let { options[DyeOptionHandle::class.java] = DyeOptionHandle(it) }
+            field = value
+        }
+
+    val enchants = mutableMapOf<String, Int>()
+    val flags = mutableSetOf<ItemFlag>()
+
+    fun build(): FolraItem {
+        if (lore.isNotEmpty()) {
+            options[LoreOptionHandle::class.java] = LoreOptionHandle(lore)
+        }
+        if (enchants.isNotEmpty()) {
+            options[EnchantsOptionHandle::class.java] = EnchantsOptionHandle(enchants)
+        }
+        if (flags.isNotEmpty()) {
+            options[FlagsOptionHandle::class.java] = FlagsOptionHandle(flags.toList())
+        }
+
+        return FolraItem(
+            factoryId = null,
+            internalId = null,
+            item = baseStack,
+            options = options.values
+        )
+    }
+}
+
+fun stackedItem(material: Material, builder: StackedItemBuilder.() -> Unit): FolraItem {
+    return StackedItemBuilder(ItemStack(material)).apply(builder).build()
+}
+
+fun ItemStack.toStackedBuilder(builder: StackedItemBuilder.() -> Unit): FolraItem {
+    return StackedItemBuilder(this.clone()).apply(builder).build()
+}
+
+@FolraDsl
+class CustomModelDataBuilder {
+    val colors = mutableListOf<Color>()
+    val floats = mutableListOf<Float>()
+    val flags = mutableListOf<Boolean>()
+    val strings = mutableListOf<String>()
+
+    fun build(): CustomModelDataOptionHandle {
+        return CustomModelDataOptionHandle(
+            colors.toList(),
+            floats.toList(),
+            flags.toList(),
+            strings.toList()
+        )
+    }
+}

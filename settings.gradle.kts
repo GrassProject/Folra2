@@ -1,0 +1,1 @@
+rootProject.name = "Folra-2.0"
