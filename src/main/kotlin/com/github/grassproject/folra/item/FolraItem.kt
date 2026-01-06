@@ -2,6 +2,7 @@ package com.github.grassproject.folra.item
 
 import com.github.grassproject.folra.item.option.ItemOptionHandle
 import com.github.grassproject.folra.item.option.ItemOptions
+import com.github.grassproject.folra.registry.serializer.ItemSerializer
 import com.google.common.collect.HashMultimap
 import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection

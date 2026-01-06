@@ -1,6 +1,6 @@
 package com.github.grassproject.folra.item.option
 
-import com.github.grassproject.folra.util.toMiniMessage
+import com.github.grassproject.folra.util.toMMComponent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
@@ -21,7 +21,7 @@ class LoreOptionHandle(
         override fun load(section: ConfigurationSection): ItemOptionHandle? {
             if (!section.contains("lore")) return null
             val lore = section.getStringList("lore").map {
-                it.toMiniMessage().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
+                it.toMMComponent().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)
             }
             if (lore.isEmpty()) return null
             return LoreOptionHandle(lore)

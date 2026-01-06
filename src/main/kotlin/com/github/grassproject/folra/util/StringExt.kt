@@ -3,7 +3,7 @@ package com.github.grassproject.folra.util
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 
-fun String.toMiniMessage(): Component =
+fun String.toMMComponent(): Component =
     MiniMessage.miniMessage().deserialize(
         this
             .replace("§","&")

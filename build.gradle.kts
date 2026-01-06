@@ -13,10 +13,7 @@ version = "${rootProject.properties["project_version"]}"
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven {
-        name = "aquatic-releases"
-        url = uri("https://repo.nekroplex.com/releases")
-    }
+    maven("https://repo.nekroplex.com/releases")
     maven("https://repo.nexomc.com/releases")
     maven("https://maven.devs.beer/")
     maven("https://repo.momirealms.net/releases/")
@@ -30,6 +27,8 @@ dependencies {
     compileOnly("dev.lone:api-itemsadder:${rootProject.properties["itemsadder_version"]}")
     compileOnly("net.momirealms:craft-engine-core:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")
+
+    implementation(project("nms:v1_21_8"))
 }
 
 kotlin {

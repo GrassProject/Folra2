@@ -1,6 +1,7 @@
 package com.github.grassproject.folra
 
 import com.github.grassproject.folra.api.FolraPlugin
+import com.github.grassproject.folra.api.nms.NMSManager
 
 class Folra : FolraPlugin() {
 
@@ -11,5 +12,10 @@ class Folra : FolraPlugin() {
 
     override fun load() {
         INSTANCE = this
+        NMSManager.init(this)
+    }
+
+    override fun onEnable() {
+        NMSManager.setup()
     }
 }
