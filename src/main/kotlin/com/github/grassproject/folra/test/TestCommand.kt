@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 object TestCommand {
 
     fun command(): LiteralArgumentBuilder<CommandSourceStack> {
-        return Commands.literal("plant")
+        return Commands.literal("packet_inv")
             .executes { context ->
                 val sender = context.source.executor
 
