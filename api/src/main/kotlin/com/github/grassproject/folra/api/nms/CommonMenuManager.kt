@@ -2,6 +2,6 @@ package com.github.grassproject.folra.api.nms
 
 object CommonMenuManager {
 
-    const val INVENTORY_ID = 126
+    const val CONTAINER_ID = 126
 
 }

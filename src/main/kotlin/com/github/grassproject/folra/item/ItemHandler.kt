@@ -4,6 +4,7 @@ import com.github.grassproject.folra.Folra
 import com.github.grassproject.folra.api.event.call
 import com.github.grassproject.folra.api.event.event
 import com.github.grassproject.folra.item.option.ItemOptionHandle
+import com.github.grassproject.folra.module.FolraModules
 import com.github.grassproject.folra.registry.registryId
 import com.github.grassproject.folra.registry.toFolraItem
 import org.bukkit.NamespacedKey
@@ -16,14 +17,14 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
-object ItemHandler {
+object ItemHandler : FolraModules {
 
     val NAMESPACE_KEY by lazy {
         NamespacedKey(Folra.INSTANCE, "Custom_Item_Registry")
     }
     val listenInteractions = mutableMapOf<String, (FolraItemInteractEvent) -> Unit>()
 
-    fun initialize() {
+    override fun register(folra: Folra) {
         event<PlayerInteractEvent> {
             handleInteract(it)
         }
@@ -35,6 +36,10 @@ object ItemHandler {
         event<InventoryClickEvent> {
             handleInventoryClick(it)
         }
+    }
+
+    override fun unregister(folra: Folra) {
+
     }
 
     fun create(
