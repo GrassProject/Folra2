@@ -50,6 +50,18 @@ class PacketListener(
             resultEvent?.let { thens.add(it.then) }
             newPackets.add(resultPacket)
         }
+        if (newPackets.isEmpty()) {
+            return
+        }
+        if (newPackets.size == 1) {
+            super.write(ctx, newPackets[0], promise)
+            thens.forEach { it() }
+            return
+        }
+
+        super.write(ctx, ClientboundBundlePacket(newPackets), promise)
+        thens.forEach { it() }
+        return
     }
 
     fun handlePacket(packet: Packet<in ClientGamePacketListener>): Pair<Packet<in ClientGamePacketListener>, PacketEvent?>? {

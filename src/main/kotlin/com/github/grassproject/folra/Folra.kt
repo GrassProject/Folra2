@@ -35,13 +35,18 @@ class Folra : FolraPlugin() {
             else -> com.github.grassproject.folra.nms.v1_21_8.NMSHandlerImpl
         }
 
+        println()
+        println("aaaa")
+        println(NMS_HANDLER)
+        println()
+
     }
 
     override fun onEnable() {
 
-        for (module in modules) {
-            module.register(this)
-        }
+//        for (module in modules) {
+//            module.register(this)
+//        }
 
         event<PlayerJoinEvent> {
             NMS_HANDLER.registerPacketListener(it.player)
@@ -55,9 +60,9 @@ class Folra : FolraPlugin() {
         }
     }
 
-    override fun onDisable() {
-        for (module in modules) {
-            module.unregister(this)
-        }
-    }
+//    override fun onDisable() {
+//        for (module in modules) {
+//            module.unregister(this)
+//        }
+//    }
 }

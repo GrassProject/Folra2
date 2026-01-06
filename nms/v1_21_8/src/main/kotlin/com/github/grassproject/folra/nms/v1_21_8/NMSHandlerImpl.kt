@@ -1,11 +1,16 @@
 package com.github.grassproject.folra.nms.v1_21_8
 
 import com.github.grassproject.folra.api.nms.NMSHandler
+import com.google.gson.JsonParser
+import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.world.item.ItemStack as NMSItemStack
 import net.minecraft.network.chat.Component as NMSComponent
 import net.minecraft.core.NonNullList
+import net.minecraft.network.Connection
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
@@ -37,6 +42,20 @@ object NMSHandlerImpl : NMSHandler {
 //        if (pipeline.get("folra_packet_listener") == null) {
 //            pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
 //        }
+
+//    override fun unregisterPacketListener(player: Player) {
+//        val connection = player.serverPlayer.connection.connection
+//        val channel = connection.channel
+//        val pipeline = channel.pipeline()
+//        if (channel != null) {
+//            try {
+//                if (pipeline.names().contains("folra_packet_listener")) {
+//                    pipeline.remove("folra_packet_listener")
+//                }
+//            } catch (_: Exception) {
+//            }
+//        }
+//    }
 
     override fun unregisterPacketListener(player: Player) {
         val channel = player.serverPlayer.connection.connection.channel ?: return
@@ -148,11 +167,11 @@ object NMSHandlerImpl : NMSHandler {
     }
 
     private fun Component.toNMSComponent(): NMSComponent {
-//        val kyoriJson = GsonComponentSerializer.gson().serialize(this)
-//        return ComponentSerialization.CODEC.parse(
-//            JsonOps.INSTANCE,
-//            JsonParser.parseString(kyoriJson)
-//        ).orThrow
-        return PaperAdventure.asVanilla(this)
+        val kyoriJson = GsonComponentSerializer.gson().serialize(this)
+        return ComponentSerialization.CODEC.parse(
+            JsonOps.INSTANCE,
+            JsonParser.parseString(kyoriJson)
+        ).orThrow
+        // return PaperAdventure.asVanilla(this)
     }
 }
