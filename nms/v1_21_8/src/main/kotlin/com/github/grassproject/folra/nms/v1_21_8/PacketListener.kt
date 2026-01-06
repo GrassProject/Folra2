@@ -1,11 +1,10 @@
 package com.github.grassproject.folra.nms.v1_21_8
 
+import com.github.grassproject.folra.api.event.call
 import com.github.grassproject.folra.api.event.packet.PacketContainerClickEvent
 import com.github.grassproject.folra.api.event.packet.PacketContainerCloseEvent
-import com.github.grassproject.folra.util.event.call
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
-import io.netty.channel.ChannelPromise
 import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket

@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${rootProject.properties["paper_version"]}-R0.1-SNAPSHOT")
 
     compileOnly("gg.aquatic:AEAPI:1.0")
     compileOnly("com.nexomc:nexo:${rootProject.properties["nexo_version"]}") { exclude("*") }
@@ -28,7 +28,8 @@ dependencies {
     compileOnly("net.momirealms:craft-engine-core:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")
 
-    implementation(project("nms:v1_21_8"))
+    implementation(project(":api"))
+    implementation(project(":nms:v1_21_8"))
 }
 
 kotlin {

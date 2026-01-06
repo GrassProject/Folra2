@@ -1,4 +1,4 @@
-package loader;
+package com.github.grassproject.folra;
 
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.PluginLoader;

@@ -4,6 +4,10 @@ import org.bukkit.plugin.java.JavaPlugin
 
 abstract class FolraPlugin : JavaPlugin(), IFolraPlugin {
 
+    companion object {
+        lateinit var INSTANCE: FolraPlugin
+    }
+
     override fun onLoad() {
         //
         load()

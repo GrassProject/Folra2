@@ -1,6 +1,6 @@
-package com.github.grassproject.folra.util.event
+package com.github.grassproject.folra.api.event
 
-import com.github.grassproject.folra.Folra
+import com.github.grassproject.folra.api.FolraPlugin
 import org.bukkit.Bukkit
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
@@ -9,7 +9,7 @@ import org.bukkit.event.Listener
 import java.util.function.Consumer
 
 fun Listener.register() {
-    Bukkit.getPluginManager().registerEvents(this, Folra.INSTANCE)
+    Bukkit.getPluginManager().registerEvents(this, FolraPlugin.INSTANCE)
 }
 
 fun Listener.unregister() {
@@ -35,7 +35,7 @@ inline fun <reified T : Event> event(
                 callback.accept(event)
             }
         },
-        Folra.INSTANCE,
+        FolraPlugin.INSTANCE,
         ignoredCancelled
     )
     return listener

@@ -1,9 +1,11 @@
 package com.github.grassproject.folra.item
 
 import com.github.grassproject.folra.Folra
+import com.github.grassproject.folra.api.event.call
+import com.github.grassproject.folra.api.event.event
 import com.github.grassproject.folra.item.option.ItemOptionHandle
-import com.github.grassproject.folra.util.event.call
-import com.github.grassproject.folra.util.event.event
+import com.github.grassproject.folra.registry.registryId
+import com.github.grassproject.folra.registry.toFolraItem
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -53,7 +55,7 @@ object ItemHandler {
         if (event.hand == EquipmentSlot.OFF_HAND) return
         if (listenInteractions.isEmpty()) return
         val item = event.item ?: return
-        val aitem = item.toStacked() ?: return
+        val aitem = item.toFolraItem() ?: return
         val registry = aitem.registryId() ?: return
 
         val interaction = listenInteractions[registry] ?: return
@@ -73,7 +75,7 @@ object ItemHandler {
 
     private fun handleSwapHandItems(event: PlayerSwapHandItemsEvent) {
         val item = event.mainHandItem
-        val aitem = item.toStacked() ?: return
+        val aitem = item.toFolraItem() ?: return
         val registry = aitem.registryId() ?: return
         val interaction = listenInteractions[registry] ?: return
 
@@ -89,7 +91,7 @@ object ItemHandler {
     private fun handleInventoryClick(event: InventoryClickEvent) {
         val player = event.whoClicked as? Player ?: return
         val item = event.currentItem ?: return
-        val aitem = item.toStacked() ?: return
+        val aitem = item.toFolraItem() ?: return
         val registry = aitem.registryId() ?: return
         val interaction = listenInteractions[registry] ?: return
 
