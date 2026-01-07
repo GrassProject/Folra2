@@ -1,20 +1,20 @@
 package com.github.grassproject.folra.nms.v1_21_8
 
 import com.github.grassproject.folra.api.nms.NMSHandler
+import com.github.grassproject.folra.api.nms.PacketHandler
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
-import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.world.item.ItemStack as NMSItemStack
 import net.minecraft.network.chat.Component as NMSComponent
 import net.minecraft.core.NonNullList
-import net.minecraft.network.Connection
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
+import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
@@ -25,17 +25,21 @@ import org.bukkit.inventory.MenuType
 
 object NMSHandlerImpl : NMSHandler {
 
-    override fun registerPacketListener(player: Player) {
-        val channel = player.serverPlayer.connection.connection.channel ?: return
-        channel.eventLoop().execute {
-            try {
-                val pipeline = channel.pipeline()
-                if (pipeline.get("folra_packet_listener") == null) {
-                    pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
-                }
-            } catch (_: Exception) {}
-        }
+    override fun createPacketHandler(player: Player): PacketHandler {
+        TODO("Not yet implemented")
     }
+
+//    override fun registerPacketListener(player: Player) {
+//        val channel = player.serverPlayer.connection.connection.channel ?: return
+//        channel.eventLoop().execute {
+//            try {
+//                val pipeline = channel.pipeline()
+//                if (pipeline.get("folra_packet_listener") == null) {
+//                    pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
+//                }
+//            } catch (_: Exception) {}
+//        }
+//    }
 //        val connection = player.serverPlayer.connection.connection
 //        val pipeline = connection.channel.pipeline()
 //
@@ -57,17 +61,17 @@ object NMSHandlerImpl : NMSHandler {
 //        }
 //    }
 
-    override fun unregisterPacketListener(player: Player) {
-        val channel = player.serverPlayer.connection.connection.channel ?: return
-        channel.eventLoop().execute {
-            try {
-                val pipeline = channel.pipeline()
-                if (pipeline.context("folra_packet_listener") != null) {
-                    pipeline.remove("folra_packet_listener")
-                }
-            } catch (_: Exception) {}
-        }
-    }
+//    override fun unregisterPacketListener(player: Player) {
+//        val channel = player.serverPlayer.connection.connection.channel ?: return
+//        channel.eventLoop().execute {
+//            try {
+//                val pipeline = channel.pipeline()
+//                if (pipeline.context("folra_packet_listener") != null) {
+//                    pipeline.remove("folra_packet_listener")
+//                }
+//            } catch (_: Exception) {}
+//        }
+//    }
 
     override fun setSlotItemPacket(
         containerId: Int,

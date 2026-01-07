@@ -2,6 +2,7 @@
 
 ## 📮 Dependency
 
+[![CodeFactor](https://www.codefactor.io/repository/github/grassproject/folra2/badge)](https://www.codefactor.io/repository/github/grassproject/folra2)
 [![](https://jitpack.io/v/GrassProject/Folra2.svg)](https://jitpack.io/#GrassProject/Folra2)
 
 ```gradle
