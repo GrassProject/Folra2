@@ -66,141 +66,141 @@ object NMSHandlerImpl : NMSHandler {
         }
     }
 
-    override fun setSlotItemPacket(
-        containerId: Int,
-        stateId: Int,
-        slot: Int,
-        itemStack: ItemStack?
-    ): Any {
-        val packet = ClientboundContainerSetSlotPacket(
-            containerId,
-            stateId,
-            slot,
-            CraftItemStack.asNMSCopy(itemStack)
-        )
-        return packet
-    }
-
-    override fun setSlotItem(
-        containerId: Int,
-        stateId: Int,
-        slot: Int,
-        itemStack: ItemStack,
-        vararg players: Player
-    ) {
-        val packet = setSlotItemPacket(containerId, stateId, slot, itemStack) as Packet<*>
-        for (player in players) {
-            player.sendPacket(packet)
-        }
-    }
-
-    override fun setContainerItemsPacket(
-        containerId: Int,
-        stateId: Int,
-        items: Collection<ItemStack?>,
-        carriedItem: ItemStack?
-    ): Any {
-        val nmsItems = NonNullList.create<NMSItemStack>()
-        nmsItems += items.map { it?.toNMS() ?: NMSItemStack.EMPTY }
-        val packet = ClientboundContainerSetContentPacket(
-            containerId,
-            stateId,
-            nmsItems,
-            carriedItem?.toNMS() ?: NMSItemStack.EMPTY
-        )
-        return packet
-    }
-
-    override fun setContainerItems(
-        containerId: Int,
-        stateId: Int,
-        items: Collection<ItemStack?>,
-        carriedItem: ItemStack?,
-        vararg players: Player
-    ) {
-        val packet = setContainerItemsPacket(containerId, stateId, items, carriedItem) as Packet<*>
-        for (player in players) {
-            player.sendPacket(packet)
-        }
-    }
-
-    override fun openContainerPacket(
-        containerId: Int,
-        menuType: MenuType,
-        title: Component
-    ): Any {
-        val packet = ClientboundOpenScreenPacket(
-            containerId,
-            CraftMenuType.bukkitToMinecraft(menuType),
-            title.toNMSComponent()
-        )
-        return packet
-    }
-
-    override fun openContainer(
-        containerId: Int,
-        menuType: MenuType,
-        title: Component,
-        vararg players: Player
-    ) {
-        val packet = openContainerPacket(containerId, menuType, title) as Packet<*>
-        for (player in players) {
-            player.sendPacket(packet)
-        }
-    }
-
-    override fun sendPacket(packet: Any, silent: Boolean, vararg players: Player) {
-        if (packet !is Packet<*>) return
-        for (player in players) {
-            if (silent) {
-                val networkManager = player.handle.connection.connection
-                networkManager.channel.writeAndFlush(packet, networkManager.channel.voidPromise())
-            } else {
-                player.sendPacket(packet)
-            }
-        }
-    }
-
-    override fun receiveWindowClick(
-        inventoryId: Int,
-        stateId: Int,
-        slot: Int,
-        buttonNum: Int,
-        clickTypeNum: Int,
-        carriedItem: ItemStack?,
-        changedSlots: Map<Int, ItemStack?>,
-        vararg players: Player,
-    ) {
-        val registryAccess = (Bukkit.getWorlds().first() as CraftWorld).handle.registryAccess()
-        val registryOps: RegistryOps<HashCode> = registryAccess.createSerializationContext(HashOps.CRC32C_INSTANCE);
-        val hashOpsGenerator: HashedPatchMap.HashGenerator = HashedPatchMap.HashGenerator { typedDataComponent ->
-            typedDataComponent.encodeValue(registryOps).getOrThrow { string ->
-                IllegalArgumentException("Failed to hash $typedDataComponent: $string")
-            }.asInt()
-        }
-
-        val map = Int2ObjectOpenHashMap<HashedStack>()
-        changedSlots.forEach { (key, value) ->
-            val nmsItem = value?.toNMS() ?: NMSItemStack.EMPTY
-            map[key] = HashedStack.create(nmsItem, hashOpsGenerator)
-        }
-
-        val packet = ServerboundContainerClickPacket(
-            inventoryId,
-            stateId,
-            slot.toShort(),
-            buttonNum.toByte(),
-            ClickType.entries[clickTypeNum],
-            map,
-            HashedStack.create(carriedItem?.toNMS() ?: NMSItemStack.EMPTY, hashOpsGenerator)
-        )
-
-        Bukkit.getScheduler().runTask(FolraPlugin.INSTANCE, Runnable {
-            for (player in players) {
-                (player as CraftPlayer).handle.connection.handleContainerClick(packet)
-            }
-        })
-    }
+//    override fun setSlotItemPacket(
+//        containerId: Int,
+//        stateId: Int,
+//        slot: Int,
+//        itemStack: ItemStack?
+//    ): Any {
+//        val packet = ClientboundContainerSetSlotPacket(
+//            containerId,
+//            stateId,
+//            slot,
+//            CraftItemStack.asNMSCopy(itemStack)
+//        )
+//        return packet
+//    }
+//
+//    override fun setSlotItem(
+//        containerId: Int,
+//        stateId: Int,
+//        slot: Int,
+//        itemStack: ItemStack,
+//        vararg players: Player
+//    ) {
+//        val packet = setSlotItemPacket(containerId, stateId, slot, itemStack) as Packet<*>
+//        for (player in players) {
+//            player.sendPacket(packet)
+//        }
+//    }
+//
+//    override fun setContainerItemsPacket(
+//        containerId: Int,
+//        stateId: Int,
+//        items: Collection<ItemStack?>,
+//        carriedItem: ItemStack?
+//    ): Any {
+//        val nmsItems = NonNullList.create<NMSItemStack>()
+//        nmsItems += items.map { it?.toNMS() ?: NMSItemStack.EMPTY }
+//        val packet = ClientboundContainerSetContentPacket(
+//            containerId,
+//            stateId,
+//            nmsItems,
+//            carriedItem?.toNMS() ?: NMSItemStack.EMPTY
+//        )
+//        return packet
+//    }
+//
+//    override fun setContainerItems(
+//        containerId: Int,
+//        stateId: Int,
+//        items: Collection<ItemStack?>,
+//        carriedItem: ItemStack?,
+//        vararg players: Player
+//    ) {
+//        val packet = setContainerItemsPacket(containerId, stateId, items, carriedItem) as Packet<*>
+//        for (player in players) {
+//            player.sendPacket(packet)
+//        }
+//    }
+//
+//    override fun openContainerPacket(
+//        containerId: Int,
+//        menuType: MenuType,
+//        title: Component
+//    ): Any {
+//        val packet = ClientboundOpenScreenPacket(
+//            containerId,
+//            CraftMenuType.bukkitToMinecraft(menuType),
+//            title.toNMSComponent()
+//        )
+//        return packet
+//    }
+//
+//    override fun openContainer(
+//        containerId: Int,
+//        menuType: MenuType,
+//        title: Component,
+//        vararg players: Player
+//    ) {
+//        val packet = openContainerPacket(containerId, menuType, title) as Packet<*>
+//        for (player in players) {
+//            player.sendPacket(packet)
+//        }
+//    }
+//
+//    override fun sendPacket(packet: Any, silent: Boolean, vararg players: Player) {
+//        if (packet !is Packet<*>) return
+//        for (player in players) {
+//            if (silent) {
+//                val networkManager = player.handle.connection.connection
+//                networkManager.channel.writeAndFlush(packet, networkManager.channel.voidPromise())
+//            } else {
+//                player.sendPacket(packet)
+//            }
+//        }
+//    }
+//
+//    override fun receiveWindowClick(
+//        inventoryId: Int,
+//        stateId: Int,
+//        slot: Int,
+//        buttonNum: Int,
+//        clickTypeNum: Int,
+//        carriedItem: ItemStack?,
+//        changedSlots: Map<Int, ItemStack?>,
+//        vararg players: Player,
+//    ) {
+//        val registryAccess = (Bukkit.getWorlds().first() as CraftWorld).handle.registryAccess()
+//        val registryOps: RegistryOps<HashCode> = registryAccess.createSerializationContext(HashOps.CRC32C_INSTANCE);
+//        val hashOpsGenerator: HashedPatchMap.HashGenerator = HashedPatchMap.HashGenerator { typedDataComponent ->
+//            typedDataComponent.encodeValue(registryOps).getOrThrow { string ->
+//                IllegalArgumentException("Failed to hash $typedDataComponent: $string")
+//            }.asInt()
+//        }
+//
+//        val map = Int2ObjectOpenHashMap<HashedStack>()
+//        changedSlots.forEach { (key, value) ->
+//            val nmsItem = value?.toNMS() ?: NMSItemStack.EMPTY
+//            map[key] = HashedStack.create(nmsItem, hashOpsGenerator)
+//        }
+//
+//        val packet = ServerboundContainerClickPacket(
+//            inventoryId,
+//            stateId,
+//            slot.toShort(),
+//            buttonNum.toByte(),
+//            ClickType.entries[clickTypeNum],
+//            map,
+//            HashedStack.create(carriedItem?.toNMS() ?: NMSItemStack.EMPTY, hashOpsGenerator)
+//        )
+//
+//        Bukkit.getScheduler().runTask(FolraPlugin.INSTANCE, Runnable {
+//            for (player in players) {
+//                (player as CraftPlayer).handle.connection.handleContainerClick(packet)
+//            }
+//        })
+//    }
 
     inline val Player.handle: ServerPlayer
         get() = (this as CraftPlayer).handle

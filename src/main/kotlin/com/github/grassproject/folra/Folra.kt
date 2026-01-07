@@ -17,7 +17,7 @@ import org.checkerframework.checker.units.qual.m
 class Folra : FolraPlugin() {
 
     val modules = listOf(
-        ItemHandler, InventoryManager
+        ItemHandler, // InventoryManager
     )
 
     companion object {
