@@ -1,22 +1,35 @@
 package com.github.grassproject.folra.nms.v1_21_8
 
+import com.github.grassproject.folra.api.FolraPlugin
 import com.github.grassproject.folra.api.nms.NMSHandler
 import com.github.grassproject.folra.api.nms.PacketHandler
+import com.google.common.hash.HashCode
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.world.item.ItemStack as NMSItemStack
 import net.minecraft.network.chat.Component as NMSComponent
 import net.minecraft.core.NonNullList
+import net.minecraft.core.component.TypedDataComponent
+import net.minecraft.network.Connection
+import net.minecraft.network.HashedPatchMap
+import net.minecraft.network.HashedStack
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket
+import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
+import net.minecraft.resources.RegistryOps
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.util.HashOps
+import net.minecraft.world.inventory.ClickType
+import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.craftbukkit.inventory.CraftMenuType
@@ -57,7 +70,7 @@ object NMSHandlerImpl : NMSHandler {
         containerId: Int,
         stateId: Int,
         slot: Int,
-        itemStack: ItemStack
+        itemStack: ItemStack?
     ): Any {
         val packet = ClientboundContainerSetSlotPacket(
             containerId,
@@ -136,10 +149,60 @@ object NMSHandlerImpl : NMSHandler {
         }
     }
 
-    inline val Player.craftPlayer: CraftPlayer
-        get() = this as CraftPlayer
+    override fun sendPacket(packet: Any, silent: Boolean, vararg players: Player) {
+        if (packet !is Packet<*>) return
+        for (player in players) {
+            if (silent) {
+                val networkManager = player.handle.connection.connection
+                networkManager.channel.writeAndFlush(packet, networkManager.channel.voidPromise())
+            } else {
+                player.sendPacket(packet)
+            }
+        }
+    }
 
-    val Player.handle: ServerPlayer
+    override fun receiveWindowClick(
+        inventoryId: Int,
+        stateId: Int,
+        slot: Int,
+        buttonNum: Int,
+        clickTypeNum: Int,
+        carriedItem: ItemStack?,
+        changedSlots: Map<Int, ItemStack?>,
+        vararg players: Player,
+    ) {
+        val registryAccess = (Bukkit.getWorlds().first() as CraftWorld).handle.registryAccess()
+        val registryOps: RegistryOps<HashCode> = registryAccess.createSerializationContext(HashOps.CRC32C_INSTANCE);
+        val hashOpsGenerator: HashedPatchMap.HashGenerator = HashedPatchMap.HashGenerator { typedDataComponent ->
+            typedDataComponent.encodeValue(registryOps).getOrThrow { string ->
+                IllegalArgumentException("Failed to hash $typedDataComponent: $string")
+            }.asInt()
+        }
+
+        val map = Int2ObjectOpenHashMap<HashedStack>()
+        changedSlots.forEach { (key, value) ->
+            val nmsItem = value?.toNMS() ?: NMSItemStack.EMPTY
+            map[key] = HashedStack.create(nmsItem, hashOpsGenerator)
+        }
+
+        val packet = ServerboundContainerClickPacket(
+            inventoryId,
+            stateId,
+            slot.toShort(),
+            buttonNum.toByte(),
+            ClickType.entries[clickTypeNum],
+            map,
+            HashedStack.create(carriedItem?.toNMS() ?: NMSItemStack.EMPTY, hashOpsGenerator)
+        )
+
+        Bukkit.getScheduler().runTask(FolraPlugin.INSTANCE, Runnable {
+            for (player in players) {
+                (player as CraftPlayer).handle.connection.handleContainerClick(packet)
+            }
+        })
+    }
+
+    inline val Player.handle: ServerPlayer
         get() = (this as CraftPlayer).handle
 
     fun Player.sendPacket(packet: Packet<*>) {
