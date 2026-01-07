@@ -44,25 +44,30 @@ object NMSHandlerImpl : NMSHandler {
         channel.eventLoop().execute {
             try {
                 val pipeline = channel.pipeline()
-                if (pipeline.get("folra_packet_listener") == null) {
+                if (pipeline.get("packet_handler") != null && pipeline.get("folra_packet_listener") == null) {
                     pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
                 }
-            } catch (_: Exception) {}
+            } catch (_: Exception) { }
         }
     }
 
     override fun unregisterPacketListener(player: Player) {
-        val connection = player.handle.connection.connection
-        val channel = connection.channel
-        val pipeline = channel.pipeline()
-        if (channel != null) {
+        val channel = player.handle.connection.connection.channel ?: return
+
+        channel.eventLoop().execute {
             try {
-                if (pipeline.names().contains("folra_packet_listener")) {
+                val pipeline = channel.pipeline()
+                if (pipeline["folra_packet_listener"] != null) {
                     pipeline.remove("folra_packet_listener")
                 }
-            } catch (_: Exception) {
+            } catch (_: Exception) { }
+        }
+    }
 
-            }
+    override fun sendPacket(packet: Any, vararg players: Player) {
+        if (packet !is Packet<*>) return
+        for (player in players) {
+            player.sendPacket(packet)
         }
     }
 
@@ -202,18 +207,4 @@ object NMSHandlerImpl : NMSHandler {
 //        })
 //    }
 
-    inline val Player.handle: ServerPlayer
-        get() = (this as CraftPlayer).handle
-
-    fun Player.sendPacket(packet: Packet<*>) {
-        this.handle.connection.send(packet)
-    }
-
-    private fun ItemStack.toNMS(): NMSItemStack {
-        return CraftItemStack.asNMSCopy(this)
-    }
-
-    private fun Component.toNMSComponent(): NMSComponent {
-        return PaperAdventure.asVanilla(this)
-    }
 }

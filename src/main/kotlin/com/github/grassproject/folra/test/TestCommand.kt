@@ -1,7 +1,6 @@
 package com.github.grassproject.folra.test
 
 import com.github.grassproject.folra.Folra
-import com.github.grassproject.folra.api.nms.CommonMenuManager
 import com.github.grassproject.folra.inventory.InventoryManager
 import com.github.grassproject.folra.inventory.InventoryType
 import com.github.grassproject.folra.inventory.PacketInventory

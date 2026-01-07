@@ -32,4 +32,6 @@ interface NMSHandler {
 //        vararg players: Player
 //    )
 
+    fun sendPacket(packet: Any, vararg players: Player)
+
 }
