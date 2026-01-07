@@ -7,10 +7,8 @@ import org.bukkit.inventory.MenuType
 
 interface NMSHandler {
 
-//    fun registerPacketListener(player: Player)
-//    fun unregisterPacketListener(player: Player)
-
-    fun createPacketHandler(player: Player): PacketHandler
+    fun registerPacketListener(player: Player)
+    fun unregisterPacketListener(player: Player)
 
     fun setSlotItemPacket(containerId: Int, stateId: Int, slot: Int, itemStack: ItemStack): Any
     fun setSlotItem(containerId: Int, stateId: Int, slot: Int, itemStack: ItemStack, vararg players: Player)

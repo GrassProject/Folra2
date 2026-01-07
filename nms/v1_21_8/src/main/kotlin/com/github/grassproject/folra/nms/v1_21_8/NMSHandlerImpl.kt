@@ -4,6 +4,7 @@ import com.github.grassproject.folra.api.nms.NMSHandler
 import com.github.grassproject.folra.api.nms.PacketHandler
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
+import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.world.item.ItemStack as NMSItemStack
@@ -25,53 +26,32 @@ import org.bukkit.inventory.MenuType
 
 object NMSHandlerImpl : NMSHandler {
 
-    override fun createPacketHandler(player: Player): PacketHandler {
-        TODO("Not yet implemented")
+    override fun registerPacketListener(player: Player) {
+        val channel = player.handle.connection.connection.channel ?: return
+        channel.eventLoop().execute {
+            try {
+                val pipeline = channel.pipeline()
+                if (pipeline.get("folra_packet_listener") == null) {
+                    pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
+                }
+            } catch (_: Exception) {}
+        }
     }
 
-//    override fun registerPacketListener(player: Player) {
-//        val channel = player.serverPlayer.connection.connection.channel ?: return
-//        channel.eventLoop().execute {
-//            try {
-//                val pipeline = channel.pipeline()
-//                if (pipeline.get("folra_packet_listener") == null) {
-//                    pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
-//                }
-//            } catch (_: Exception) {}
-//        }
-//    }
-//        val connection = player.serverPlayer.connection.connection
-//        val pipeline = connection.channel.pipeline()
-//
-//        if (pipeline.get("folra_packet_listener") == null) {
-//            pipeline.addBefore("packet_handler", "folra_packet_listener", PacketListener(player))
-//        }
+    override fun unregisterPacketListener(player: Player) {
+        val connection = player.handle.connection.connection
+        val channel = connection.channel
+        val pipeline = channel.pipeline()
+        if (channel != null) {
+            try {
+                if (pipeline.names().contains("folra_packet_listener")) {
+                    pipeline.remove("folra_packet_listener")
+                }
+            } catch (_: Exception) {
 
-//    override fun unregisterPacketListener(player: Player) {
-//        val connection = player.serverPlayer.connection.connection
-//        val channel = connection.channel
-//        val pipeline = channel.pipeline()
-//        if (channel != null) {
-//            try {
-//                if (pipeline.names().contains("folra_packet_listener")) {
-//                    pipeline.remove("folra_packet_listener")
-//                }
-//            } catch (_: Exception) {
-//            }
-//        }
-//    }
-
-//    override fun unregisterPacketListener(player: Player) {
-//        val channel = player.serverPlayer.connection.connection.channel ?: return
-//        channel.eventLoop().execute {
-//            try {
-//                val pipeline = channel.pipeline()
-//                if (pipeline.context("folra_packet_listener") != null) {
-//                    pipeline.remove("folra_packet_listener")
-//                }
-//            } catch (_: Exception) {}
-//        }
-//    }
+            }
+        }
+    }
 
     override fun setSlotItemPacket(
         containerId: Int,
@@ -159,11 +139,11 @@ object NMSHandlerImpl : NMSHandler {
     inline val Player.craftPlayer: CraftPlayer
         get() = this as CraftPlayer
 
-    inline val Player.serverPlayer: ServerPlayer
+    val Player.handle: ServerPlayer
         get() = (this as CraftPlayer).handle
 
     fun Player.sendPacket(packet: Packet<*>) {
-        this.serverPlayer.connection.send(packet)
+        this.handle.connection.send(packet)
     }
 
     private fun ItemStack.toNMS(): NMSItemStack {
@@ -171,11 +151,6 @@ object NMSHandlerImpl : NMSHandler {
     }
 
     private fun Component.toNMSComponent(): NMSComponent {
-        val kyoriJson = GsonComponentSerializer.gson().serialize(this)
-        return ComponentSerialization.CODEC.parse(
-            JsonOps.INSTANCE,
-            JsonParser.parseString(kyoriJson)
-        ).orThrow
-        // return PaperAdventure.asVanilla(this)
+        return PaperAdventure.asVanilla(this)
     }
 }

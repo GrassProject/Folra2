@@ -3,20 +3,21 @@ package com.github.grassproject.folra.item.option
 import net.kyori.adventure.key.Key
 
 enum class ItemOptions(val key: Key) {
-    AMOUNT(AmountOptionHandle.Companion.key),
+    AMOUNT(AmountOptionHandle.key),
+    // CLIENT_SIDE_LORE(ClientsideLoreOptionHandler.key),
     CUSTOM_MODEL_DATA_LEGACY(CustomModelDataLegacyOptionHandle.key),
     CUSTOM_MODEL_DATA(CustomModelDataOptionHandle.key),
-    DAMAGE(DamageOptionHandle.Companion.key),
+    DAMAGE(DamageOptionHandle.key),
     DISPLAY_NAME(DisplayNameOptionHandle.key),
-    DYE(DyeOptionHandle.Companion.key),
-    ENCHANTS(EnchantsOptionHandle.Companion.key),
-    FLAGS(FlagsOptionHandle.Companion.key),
+    DYE(DyeOptionHandle.key),
+    ENCHANTS(EnchantsOptionHandle.key),
+    FLAGS(FlagsOptionHandle.key),
     ITEM_MODEL(ItemModelOptionHandle.key),
-    LORE(LoreOptionHandle.Companion.key),
-    MAX_DAMAGE(MaxDamageOptionHandle.Companion.key),
-    MAX_STACK_SIZE(MaxStackSizeOptionHandle.Companion.key),
-    RARITY(RarityOptionHandle.Companion.key),
-    SPAWNER_TYPE(SpawnerTypeOptionHandle.Companion.key),
-    TOOLTIP_STYLE(TooltipStyleOptionHandle.Companion.key),
-    UNBREAKABLE(UnbreakableOptionHandle.Companion.key)
+    LORE(LoreOptionHandle.key),
+    MAX_DAMAGE(MaxDamageOptionHandle.key),
+    MAX_STACK_SIZE(MaxStackSizeOptionHandle.key),
+    RARITY(RarityOptionHandle.key),
+    SPAWNER_TYPE(SpawnerTypeOptionHandle.key),
+    TOOLTIP_STYLE(TooltipStyleOptionHandle.key),
+    UNBREAKABLE(UnbreakableOptionHandle.key)
 }

@@ -1,120 +1,87 @@
 package com.github.grassproject.folra.nms.v1_21_8
 
-import com.github.grassproject.folra.api.event.PacketEvent
 import com.github.grassproject.folra.api.event.call
-import com.github.grassproject.folra.api.event.packet.PacketContainerClickEvent
-import com.github.grassproject.folra.api.event.packet.PacketContainerCloseEvent
-import com.github.grassproject.folra.api.event.packet.PacketContainerContentEvent
-import com.github.grassproject.folra.api.event.packet.PacketContainerOpenEvent
-import com.github.grassproject.folra.api.event.packet.PacketContainerSetSlotEvent
+import com.github.grassproject.folra.api.event.packet.*
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import net.minecraft.core.NonNullList
 import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientGamePacketListener
-import net.minecraft.network.protocol.game.ClientboundBundlePacket
-import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
-import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
-import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
-import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket
-import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
-import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
+import net.minecraft.network.protocol.game.*
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import net.minecraft.world.item.ItemStack as NMSItemStack
 
 class PacketListener(
     val player: Player,
 ) : ChannelDuplexHandler() {
 
-    override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-        val packets =
-            if (msg is ClientboundBundlePacket) msg.subPackets() else listOf<Packet<in ClientGamePacketListener>>(
-                msg as? Packet<ClientGamePacketListener> ?: return super.write(
-                    ctx,
-                    msg,
-                    promise
-                )
-            )
-        val newPackets = ArrayList<Packet<in ClientGamePacketListener>>()
-        val thens = ArrayList<() -> Unit>()
-        for (subPacket in packets) {
-            val pair = handlePacket(subPacket) ?: continue
-            val (resultPacket, resultEvent) = pair
-            resultEvent?.let { thens.add(it.then) }
-            newPackets.add(resultPacket)
-        }
-        if (newPackets.isEmpty()) {
-            return
-        }
-        if (newPackets.size == 1) {
-            super.write(ctx, newPackets[0], promise)
-            thens.forEach { it() }
-            return
-        }
+//    override fun write(ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise) {
+//        super.write(ctx, if (msg is Packet<*>) msg.handleClientbound() else msg, promise)
+//    }
 
-        super.write(ctx, ClientboundBundlePacket(newPackets), promise)
-        thens.forEach { it() }
-        return
+    override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
+        super.channelRead(ctx, if (msg is Packet<*>) msg.handleServerbound() else msg)
     }
 
-    fun handlePacket(packet: Packet<in ClientGamePacketListener>): Pair<Packet<in ClientGamePacketListener>, PacketEvent?>? {
-        when (packet) {
+    private fun <T : ClientGamePacketListener> Packet<in T>.handleClientbound(): Packet<in T>? {
+        when (this) {
             is ClientboundContainerSetSlotPacket -> {
                 val event = PacketContainerSetSlotEvent(
                     player,
-                    packet.containerId,
-                    packet.stateId,
-                    CraftItemStack.asCraftMirror(packet.item)
+                    containerId,
+                    stateId,
+                    CraftItemStack.asCraftMirror(this.item)
                 )
                 event.call()
                 if (event.isCancelled) {
                     return null
                 }
+
                 val newPack = ClientboundContainerSetSlotPacket(
-                    packet.containerId,
-                    packet.stateId,
-                    packet.slot,
+                    containerId,
+                    stateId,
+                    slot,
                     CraftItemStack.asNMSCopy(event.itemStack)
                 )
-                return newPack to event
+                return newPack
             }
 
             is ClientboundContainerSetContentPacket -> {
                 val event = PacketContainerContentEvent(
                     player,
-                    packet.containerId,
-                    packet.items.map { (CraftItemStack.asCraftMirror(it)) }.toMutableList(),
-                    CraftItemStack.asCraftMirror(packet.carriedItem)
+                    this.containerId,
+                    this.items.map { (CraftItemStack.asCraftMirror(it)) }.toMutableList(),
+                    CraftItemStack.asCraftMirror(this.carriedItem)
                 )
                 event.call()
                 if (event.isCancelled) {
                     return null
                 }
+
                 val newPacket = ClientboundContainerSetContentPacket(
-                    packet.containerId,
-                    packet.stateId,
-                    NonNullList.create<net.minecraft.world.item.ItemStack>().apply {
+                    this.containerId,
+                    this.stateId,
+                    NonNullList.create<NMSItemStack>().apply {
                         addAll(event.contents.map { (CraftItemStack.asNMSCopy(it)) })
                     },
                     CraftItemStack.asNMSCopy(event.carriedItem)
                 )
-                return newPacket to event
+                return newPacket
             }
 
             is ClientboundOpenScreenPacket -> {
-                val event = PacketContainerOpenEvent(player, packet.containerId)
+                val event = PacketContainerOpenEvent(player, this.containerId)
                 event.call()
                 if (event.isCancelled) {
                     return null
                 }
-                return packet to event
+                return this
             }
 
             is ClientboundContainerClosePacket -> {
@@ -123,27 +90,26 @@ class PacketListener(
                 if (event.isCancelled) {
                     return null
                 }
-                return packet to event
+                return this
             }
 
         }
-        return packet to null
+        return this
     }
 
-    override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
-        when (msg) {
+    private fun <T : ClientGamePacketListener> Packet<in T>.handleServerbound(): Packet<in T>? {
+        when (this) {
             is ServerboundContainerClosePacket -> {
                 val event = PacketContainerCloseEvent(player)
                 event.call()
                 if (event.isCancelled) {
-                    return
+                    return null
                 }
-                super.channelRead(ctx, msg)
-                return
+                return this
             }
 
             is ServerboundContainerClickPacket -> {
-                val carriedItem = (msg.carriedItem as? HashedStack.ActualItem)?.let { carried ->
+                val carriedItem = (this.carriedItem as? HashedStack.ActualItem)?.let { carried ->
                     val type = carried.item.registeredName
                     carried.components.addedComponents
 
@@ -161,22 +127,22 @@ class PacketListener(
                 }
                 val event = PacketContainerClickEvent(
                     player,
-                    msg.containerId,
-                    msg.stateId,
-                    msg.slotNum.toInt(),
-                    msg.buttonNum.toInt(),
-                    msg.clickType.ordinal,
+                    this.containerId,
+                    this.stateId,
+                    this.slotNum.toInt(),
+                    this.buttonNum.toInt(),
+                    this.clickType.ordinal,
                     carriedItem,
-                    msg.changedSlots.mapValues { null as ItemStack? },
+                    this.changedSlots.mapValues { null as ItemStack? },
                 )
                 event.call()
                 if (event.isCancelled) {
-                    return
+                    return null
                 }
-                super.channelRead(ctx, msg)
-                return
+                return this
             }
         }
-        super.channelRead(ctx, msg)
+        return this
     }
+
 }

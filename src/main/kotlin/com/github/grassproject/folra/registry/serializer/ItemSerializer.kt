@@ -12,6 +12,7 @@ object ItemSerializer {
 
     val optionFactories = hashSetOf(
         AmountOptionHandle,
+        // ClientsideLoreOptionHandler,
         CustomModelDataLegacyOptionHandle,
         CustomModelDataOptionHandle,
         DamageOptionHandle,

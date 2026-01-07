@@ -30,6 +30,8 @@ class StackedItemBuilder(private val baseStack: ItemStack) {
 
     val lore = mutableListOf<Component>()
 
+    // val clientsideLore = mutableListOf<Component>()
+
     var customModelDataLegacy: Int? = null
         set(value) {
             value?.let { options[CustomModelDataLegacyOptionHandle::class.java] = CustomModelDataLegacyOptionHandle(it) }
@@ -106,6 +108,9 @@ class StackedItemBuilder(private val baseStack: ItemStack) {
         if (lore.isNotEmpty()) {
             options[LoreOptionHandle::class.java] = LoreOptionHandle(lore)
         }
+//        if (clientsideLore.isNotEmpty()) {
+//            options[ClientsideLoreOptionHandler::class.java] = ClientsideLoreOptionHandler(lore)
+//        }
         if (enchants.isNotEmpty()) {
             options[EnchantsOptionHandle::class.java] = EnchantsOptionHandle(enchants)
         }
