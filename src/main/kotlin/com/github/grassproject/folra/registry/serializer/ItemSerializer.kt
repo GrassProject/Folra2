@@ -2,33 +2,12 @@ package com.github.grassproject.folra.registry.serializer
 
 import com.github.grassproject.folra.item.FolraItem
 import com.github.grassproject.folra.item.ItemHandler
-import com.github.grassproject.folra.item.option.*
 import com.github.grassproject.folra.registry.FolraRegistry
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 
 object ItemSerializer {
-
-    val optionFactories = hashSetOf(
-        AmountOptionHandle,
-        // ClientsideLoreOptionHandler,
-        CustomModelDataLegacyOptionHandle,
-        CustomModelDataOptionHandle,
-        DamageOptionHandle,
-        DisplayNameOptionHandle,
-        DyeOptionHandle,
-        EnchantsOptionHandle,
-        FlagsOptionHandle,
-        ItemModelOptionHandle,
-        LoreOptionHandle,
-        MaxDamageOptionHandle,
-        MaxStackSizeOptionHandle,
-        RarityOptionHandle,
-        SpawnerTypeOptionHandle,
-        TooltipStyleOptionHandle,
-        UnbreakableOptionHandle
-    )
 
     inline fun <reified T : Any> fromSection(
         section: ConfigurationSection?, crossinline mapper: (ConfigurationSection, FolraItem) -> T
@@ -44,11 +23,10 @@ object ItemSerializer {
         section ?: return null
         return try {
             val material = section.getString("material", "STONE")!!
-            val options = optionFactories.mapNotNull { it.load(section) }
+            // val options = optionFactories.mapNotNull { it.load(section) }
 
             return create(
                 material,
-                options,
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -69,7 +47,6 @@ object ItemSerializer {
 
     private fun create(
         namespace: String,
-        options: List<ItemOptionHandle>
     ): FolraItem? {
         var factoryId: String? = null
         val itemStack = if (namespace.contains(":")) {
@@ -86,7 +63,6 @@ object ItemSerializer {
             factoryId,
             namespace,
             itemStack,
-            options
         )
     }
 
