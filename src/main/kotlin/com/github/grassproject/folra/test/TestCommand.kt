@@ -18,7 +18,7 @@ object TestCommand {
                 val sender = context.source.executor
 
                 if (sender is Player) {
-                    val folraItem = folraItem(Material.STONE) {
+                    val folraItem = folraItem("craftengine:default:globe") {
                         displayName = "Test".toMMComponent()
                         lore(
                             "aa".toMMComponent(),

@@ -45,24 +45,47 @@ object ItemSerializer {
         return sections.mapNotNull { fromSection(it, mapper) }
     }
 
-    private fun create(
-        namespace: String,
-    ): FolraItem? {
-        var factoryId: String? = null
-        val itemStack = if (namespace.contains(":")) {
-            val id = namespace.split(":").first().uppercase()
-            factoryId = id
+//    private fun create(
+//        namespace: String,
+//    ): FolraItem? {
+//        var factoryId: String? = null
+//        val itemStack = if (namespace.contains(":")) {
+//            val id = namespace.split(":").first().uppercase()
+//            factoryId = id
+//
+//            val factory = FolraRegistry.ITEM_FACTORIES[id] ?: return null
+//            factory.create(namespace.substring(id.length + 1))
+//        } else {
+//            ItemStack(Material.valueOf(namespace.uppercase()))
+//        } ?: return null
+//
+//        return ItemHandler.create(
+//            factoryId,
+//            namespace,
+//            itemStack,
+//        )
+//    }
 
-            val factory = FolraRegistry.ITEM_FACTORIES[id] ?: return null
-            factory.create(namespace.substring(id.length + 1))
+    fun createFactory(namespace: String): Pair<String?, ItemStack?> {
+        return if (namespace.contains(":")) {
+            val id = namespace.split(":").first().uppercase()
+            val factory = FolraRegistry.ITEM_FACTORIES[id]
+            id to factory?.create(namespace.substring(id.length + 1))
         } else {
-            ItemStack(Material.valueOf(namespace.uppercase()))
-        } ?: return null
+            val material = runCatching { Material.valueOf(namespace.uppercase()) }.getOrNull()
+            null to material?.let { ItemStack(it) }
+        }
+    }
+
+    private fun create(namespace: String): FolraItem? {
+        val (factoryId, itemStack) = createFactory(namespace)
+
+        if (itemStack == null) return null
 
         return ItemHandler.create(
             factoryId,
             namespace,
-            itemStack,
+            itemStack
         )
     }
 

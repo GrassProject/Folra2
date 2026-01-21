@@ -2,6 +2,7 @@ package com.github.grassproject.folra.item
 
 import com.github.grassproject.folra.annotation.FolraDsl
 import com.github.grassproject.folra.item.data.CustomModelData
+import com.github.grassproject.folra.registry.serializer.ItemSerializer
 import com.github.grassproject.folra.util.item.setDisplayName
 import com.github.grassproject.folra.util.item.setSpawnerType
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -24,6 +25,8 @@ import io.papermc.paper.datacomponent.item.CustomModelData as PaperCustomModelDa
 
 @FolraDsl
 class FolraItemBuilder(private val baseStack: ItemStack) {
+
+    constructor(namespace: String) : this(ItemSerializer.createFactory(namespace).second ?: ItemStack(Material.AIR))
 
     var amount: Int = 1
         set(value) {
@@ -173,6 +176,10 @@ class FolraItemBuilder(private val baseStack: ItemStack) {
 
 fun folraItem(material: Material, builder: FolraItemBuilder.() -> Unit): FolraItem {
     return FolraItemBuilder(ItemStack(material)).apply(builder).build()
+}
+
+fun folraItem(namespace: String, builder: FolraItemBuilder.() -> Unit): FolraItem {
+    return FolraItemBuilder(namespace).apply(builder).build()
 }
 
 fun ItemStack.toFolraBuilder(builder: FolraItemBuilder.() -> Unit): FolraItem {
