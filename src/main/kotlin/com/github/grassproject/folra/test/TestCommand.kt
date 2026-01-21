@@ -6,6 +6,7 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
@@ -18,7 +19,7 @@ object TestCommand {
                 val sender = context.source.executor
 
                 if (sender is Player) {
-                    val folraItem = folraItem("craftengine:default:globe") {
+                    val folraItem = folraItem(Material.STONE) { /*folraItem("craftengine:default:globe") {*/
                         displayName = "Test".toMMComponent()
                         lore(
                             "aa".toMMComponent(),
@@ -26,6 +27,10 @@ object TestCommand {
                         )
                         enchants["sharpness"] = 10
                         flag(ItemFlag.HIDE_ATTRIBUTES)
+                        customModelData {
+                            floats.add(1.5f)
+                            colors.add(Color.RED)
+                        }
                     }
                     folraItem.giveItem(sender, 5)
                 }

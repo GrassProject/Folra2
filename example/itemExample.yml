@@ -1,0 +1,9 @@
+id:
+  material: aaa # String
+  display-name: <> # Component
+  lore: [ ] # List<Component>
+
+namespace:id:
+  material: aaa # String
+  display-name: <> # Component
+  lore: [ ] # List<Component>
