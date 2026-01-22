@@ -1,4 +1,4 @@
-package com.github.grassproject.folra.item1.component
+package com.github.grassproject.folra.item.component
 
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey

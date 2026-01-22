@@ -27,6 +27,7 @@ dependencies {
     compileOnly("dev.lone:api-itemsadder:${rootProject.properties["itemsadder_version"]}")
     compileOnly("net.momirealms:craft-engine-core:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")
+    compileOnly("io.netty:netty-all:4.2.9.Final")
 
     implementation(project(":api"))
     implementation(project(":nms:v1_21_8"))

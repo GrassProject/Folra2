@@ -1,4 +1,4 @@
-package com.github.grassproject.folra.item1.component
+package com.github.grassproject.folra.item.component
 
 import com.github.grassproject.folra.util.toColorOrNull
 import io.papermc.paper.datacomponent.DataComponentTypes

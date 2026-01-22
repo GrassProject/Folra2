@@ -1,25 +1,28 @@
-package com.github.grassproject.folra.item1.component
+package com.github.grassproject.folra.item.component
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 
-class MaxDamageComponent(
-    val maxDamage: Int
+class ItemModelComponent(
+    val itemModel: Key
 ) : ItemComponentHandle {
 
     override val key: Key = Companion.key
 
     override fun apply(itemStack: ItemStack) {
-        itemStack.setData(DataComponentTypes.MAX_DAMAGE, maxDamage)
+        itemStack.setData(DataComponentTypes.ITEM_MODEL, itemModel)
     }
 
     companion object : ItemComponentLoader {
-        override val key: Key = Key.key("itemcomponent:max-damage")
+        override val key: Key = Key.key("itemcomponent:item-model")
         override fun load(section: ConfigurationSection): ItemComponentHandle? {
-            if (!section.contains("max-damage")) return null
-            return MaxDamageComponent(section.getInt("max-damage"))
+            val itemModel = section.getString("item-model")
+                ?.let { runCatching { Key.key(it) }.getOrNull() }
+                ?: return null
+            return ItemModelComponent(itemModel)
         }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.github.grassproject.folra.item1.component
+package com.github.grassproject.folra.item.component
 
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack

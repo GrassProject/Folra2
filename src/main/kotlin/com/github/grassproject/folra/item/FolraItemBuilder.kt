@@ -1,7 +1,7 @@
-package com.github.grassproject.folra.item1
+package com.github.grassproject.folra.item
 
 import com.github.grassproject.folra.annotation.FolraDsl
-import com.github.grassproject.folra.item1.component.*
+import com.github.grassproject.folra.item.component.*
 import com.github.grassproject.folra.registry.serializer.ItemSerializer
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -13,19 +13,21 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 @FolraDsl
-class FolraItemBuilder(private val baseStack: ItemStack) {
+class FolraItemBuilder(
+    private val baseStack: ItemStack
+) {
 
-    private val itemComponents = mutableMapOf<Class<out ItemComponentHandle>, ItemComponentHandle>()
+    private val components = mutableMapOf<Class<out ItemComponentHandle>, ItemComponentHandle>()
 
     var amount: Int = 1
         set(value) {
-            itemComponents[AmountComponent::class.java] = AmountComponent(value)
+            components[AmountComponent::class.java] = AmountComponent(value)
             field = value
         }
 
     var displayName: Component? = null
         set(value) {
-            value?.let { itemComponents[DisplayNameComponent::class.java] = DisplayNameComponent(it) }
+            value?.let { components[DisplayNameComponent::class.java] = DisplayNameComponent(it) }
             field = value
         }
 
@@ -39,39 +41,39 @@ class FolraItemBuilder(private val baseStack: ItemStack) {
 
     fun customModelData(builder: CustomModelDataBuilder.() -> Unit) {
         val dataBuilder = CustomModelDataBuilder().apply(builder)
-        itemComponents[CustomModelDataComponent::class.java] = dataBuilder.build()
+        components[CustomModelDataComponent::class.java] = dataBuilder.build()
     }
 
     var itemModel: Key? = null
         set(value) {
-            value?.let { itemComponents[ItemModelComponent::class.java] = ItemModelComponent(it) }
+            value?.let { components[ItemModelComponent::class.java] = ItemModelComponent(it) }
             field = value
         }
 
     var damage: Int? = null
         set(value) {
-            value?.let { itemComponents[DamageComponent::class.java] = DamageComponent(it) }
+            value?.let { components[DamageComponent::class.java] = DamageComponent(it) }
             field = value
         }
 
     var maxDamage: Int? = null
         set(value) {
-            value?.let { itemComponents[MaxDamageComponent::class.java] = MaxDamageComponent(it) }
+            value?.let { components[MaxDamageComponent::class.java] = MaxDamageComponent(it) }
             field = value
         }
 
     var maxStackSize: Int? = null
         set(value) {
-            value?.let { itemComponents[MaxStackSizeComponent::class.java] = MaxStackSizeComponent(it) }
+            value?.let { components[MaxStackSizeComponent::class.java] = MaxStackSizeComponent(it) }
             field = value
         }
 
     var unbreakable: Boolean = false
         set(value) {
             if (!value) {
-                itemComponents -= UnbreakableComponent::class.java
+                components -= UnbreakableComponent::class.java
             } else {
-                itemComponents[UnbreakableComponent::class.java] = UnbreakableComponent()
+                components[UnbreakableComponent::class.java] = UnbreakableComponent()
             }
             field = value
         }
@@ -79,26 +81,26 @@ class FolraItemBuilder(private val baseStack: ItemStack) {
 
     var spawnerType: EntityType? = null
         set(value) {
-            value?.let { itemComponents[SpawnerTypeComponent::class.java] = SpawnerTypeComponent(it) }
+            value?.let { components[SpawnerTypeComponent::class.java] = SpawnerTypeComponent(it) }
             field = value
         }
 
     var tooltipStyle: Key? = null
         set(value) {
-            value?.let { itemComponents[TooltipStyleComponent::class.java] = TooltipStyleComponent(it) }
+            value?.let { components[TooltipStyleComponent::class.java] = TooltipStyleComponent(it) }
             field = value
         }
 
     var dyeColor: Color? = null
         set(value) {
-            value?.let { itemComponents[DyeComponent::class.java] = DyeComponent(it) }
+            value?.let { components[DyeComponent::class.java] = DyeComponent(it) }
             field = value
         }
 
     val enchants = mutableMapOf<String, Int>()
     fun enchants(builder: EnchantmentBuilder.() -> Unit) {
         val enchantBuilder = EnchantmentBuilder().apply(builder)
-        itemComponents[EnchantsComponent::class.java] = enchantBuilder.build()
+        components[EnchantsComponent::class.java] = enchantBuilder.build()
     }
 
     val flags = mutableSetOf<ItemFlag>()
@@ -108,21 +110,20 @@ class FolraItemBuilder(private val baseStack: ItemStack) {
 
     fun build(): FolraItem {
         if (lore.isNotEmpty()) {
-            itemComponents[LoreComponent::class.java] = LoreComponent(lore)
+            components[LoreComponent::class.java] = LoreComponent(lore)
         }
         if (enchants.isNotEmpty()) {
-            itemComponents[EnchantsComponent::class.java] = EnchantsComponent(enchants)
+            components[EnchantsComponent::class.java] = EnchantsComponent(enchants)
         }
         if (flags.isNotEmpty()) {
-            itemComponents[FlagsComponent::class.java] = FlagsComponent(flags.toList())
+            components[FlagsComponent::class.java] = FlagsComponent(flags.toList())
         }
 
-        return FolraItemImpl(
-            null,
-            null,
+        return FolraItem(
             baseStack,
-            itemComponents.values
+            components.values
         )
+
     }
 }
 

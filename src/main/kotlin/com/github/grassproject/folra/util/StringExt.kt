@@ -35,3 +35,5 @@ fun String.toMMComponent(): Component =
 
 fun String.toComponent(): Component =
     Component.text(this)
+
+fun String.toKeyStandard(): String = this.lowercase().trim()

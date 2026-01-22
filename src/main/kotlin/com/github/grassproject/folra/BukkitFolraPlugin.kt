@@ -2,10 +2,15 @@ package com.github.grassproject.folra
 
 import com.github.grassproject.folra.api.FolraPlugin
 import com.github.grassproject.folra.api.nms.NMSHandler
-import com.github.grassproject.folra.item1.ItemHandler
+import com.github.grassproject.folra.item.FolraItem
+import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.registry.FolraRegistry
+import com.github.grassproject.folra.registry.register
 import com.github.grassproject.folra.test.TestCommand
+import com.github.grassproject.folra.util.Logger
 import com.github.grassproject.folra.util.version.MinecraftVersion
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import net.kyori.adventure.key.Key
 
 class BukkitFolraPlugin : FolraPlugin() {
 
@@ -67,5 +72,23 @@ class BukkitFolraPlugin : FolraPlugin() {
         }
 
         // PacketInvListener.init()
+        val keys = config.getKeys(false)
+        Logger.debug("개수: ${keys.size}")
+
+        FolraRegistry.ITEM.clear()
+        for (key in keys) {
+            val section = config.getConfigurationSection(key)
+            if (section == null) {
+                Logger.debug("'$key' is null")
+                continue
+            }
+            val folraItem = FolraItem.loadFromYml(section)
+            if (folraItem != null) {
+                folraItem.register("folra", Key.key(key.lowercase()))
+                Logger.debug("아이템 등록 성공: folra:${Key.key(key.lowercase())}")
+            } else {
+                Logger.debug("'$key' loadFromYml is null.")
+            }
+        }
     }
 }

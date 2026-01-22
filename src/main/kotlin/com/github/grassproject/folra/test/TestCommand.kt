@@ -1,8 +1,9 @@
 package com.github.grassproject.folra.test
 
 import com.github.grassproject.folra.BukkitFolraPlugin
-import com.github.grassproject.folra.item1.FolraItem
-import com.github.grassproject.folra.item1.folraItem
+import com.github.grassproject.folra.item.FolraItem
+import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.item.folraItem
 import com.github.grassproject.folra.registry.FolraRegistry
 import com.github.grassproject.folra.registry.register
 import com.github.grassproject.folra.registry.registryId
@@ -17,6 +18,7 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
+import org.bukkit.persistence.PersistentDataType
 
 object TestCommand {
 
@@ -48,14 +50,15 @@ object TestCommand {
                         )
                     }
                     folraItem.giveItem(sender)
-                    callBoneRodItem()
 
                     FolraRegistry.ITEM["folra:customfishing:bone_rod"]?.let {
                         sendLog(it)
                         it.giveItem(sender)
                     }
 
-                    FolraRegistry.ITEM["folra:bone_rod"]?.let {
+                    println("a")
+
+                    FolraRegistry.ITEM["folra:minecraft:bone_rod"]?.let {
                         sendLog(it)
                         it.giveItem(sender)
                     }
@@ -66,33 +69,8 @@ object TestCommand {
             }
     }
 
-    fun callBoneRodItem() {
-        val config = BukkitFolraPlugin.INSTANCE.config
-        val keys = config.getKeys(false)
-
-        Logger.debug("개수: ${keys.size}")
-
-        FolraRegistry.ITEM.clear()
-        for (key in keys) {
-            val section = config.getConfigurationSection(key)
-            if (section == null) {
-                Logger.debug("'$key' is null")
-                continue
-            }
-            val folraItem = FolraItem.loadFromYml(section)
-
-            if (folraItem != null) {
-                folraItem.register("folra",key.lowercase())
-                Logger.debug("아이템 등록 성공: folra:${key.lowercase()}")
-            } else {
-                Logger.debug("'$key' loadFromYml is null.")
-            }
-        }
-    }
-
     fun sendLog(folraItem: FolraItem) {
-        println("factory Id: ${folraItem.factoryId}")
-        println("internal Id: ${folraItem.internalId}")
+        println("PDC: ${folraItem.getUnmodifiedItem().persistentDataContainer.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING)}")
         println("real Id: ${folraItem.registryId()}")
     }
 }

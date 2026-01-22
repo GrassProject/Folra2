@@ -1,6 +1,6 @@
-package com.github.grassproject.folra.item1.factory
+package com.github.grassproject.folra.item.factory
 
-import com.github.grassproject.folra.item1.ItemHandler
+import com.github.grassproject.folra.item.ItemHandler
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems
 import net.momirealms.craftengine.core.item.ItemBuildContext
 import net.momirealms.craftengine.core.plugin.context.ContextHolder

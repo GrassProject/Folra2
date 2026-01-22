@@ -1,9 +1,9 @@
-package com.github.grassproject.folra.item1
+package com.github.grassproject.folra.item
 
 import com.github.grassproject.folra.BukkitFolraPlugin
 import com.github.grassproject.folra.api.event.call
 import com.github.grassproject.folra.api.event.event
-import com.github.grassproject.folra.item1.component.ItemComponentHandle
+import com.github.grassproject.folra.item.component.ItemComponentHandle
 import com.github.grassproject.folra.module.FolraModules
 import com.github.grassproject.folra.registry.registryId
 import com.github.grassproject.folra.registry.toFolraItem
@@ -19,9 +19,8 @@ import org.bukkit.inventory.ItemStack
 
 object ItemHandler : FolraModules {
 
-    val ITEM_KEY by lazy {
-        NamespacedKey("folra", "id")
-    }
+    val ITEM_KEY = NamespacedKey("folra", "id")
+
     val listenInteractions = mutableMapOf<String, (FolraItemInteractEvent) -> Unit>()
 
     override fun register(folra: BukkitFolraPlugin) {
@@ -41,16 +40,12 @@ object ItemHandler : FolraModules {
     override fun unregister(folra: BukkitFolraPlugin) {}
 
     fun create(
-        factoryId: String?,
-        internalId: String?,
         item: ItemStack,
-        itemComponents: List<ItemComponentHandle>
+        components: List<ItemComponentHandle>
     ): FolraItem {
-        return FolraItemImpl(
-            factoryId,
-            internalId,
+        return FolraItem(
             item,
-            itemComponents
+            components
         )
     }
 

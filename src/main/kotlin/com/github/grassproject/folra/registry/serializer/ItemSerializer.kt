@@ -1,8 +1,8 @@
 package com.github.grassproject.folra.registry.serializer
 
-import com.github.grassproject.folra.item1.FolraItem
-import com.github.grassproject.folra.item1.ItemHandler
-import com.github.grassproject.folra.item1.component.*
+import com.github.grassproject.folra.item.FolraItem
+import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.item.component.*
 import com.github.grassproject.folra.registry.FolraRegistry
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
@@ -77,40 +77,40 @@ object ItemSerializer {
         return null to material?.let { ItemStack(it) }
     }
 
-    private fun create(
-        namespace: String,
-        itemComponents: List<ItemComponentHandle>
-    ): FolraItem? {
-        val (factoryId, itemStack) = createFactory(namespace)
-
-        if (itemStack == null) return null
-
-        return ItemHandler.create(
-            factoryId,
-            namespace,
-            itemStack,
-            itemComponents
-        )
-    }
-
-    //    private fun create(
+//    private fun create(
 //        namespace: String,
+//        itemComponents: List<ItemComponentHandle>
 //    ): FolraItem? {
-//        var factoryId: String? = null
-//        val itemStack = if (namespace.contains(":")) {
-//            val id = namespace.split(":").first().uppercase()
-//            factoryId = id
+//        val (factoryId, itemStack) = createFactory(namespace)
 //
-//            val factory = FolraRegistry.ITEM_FACTORIES[id] ?: return null
-//            factory.create(namespace.substring(id.length + 1))
-//        } else {
-//            ItemStack(Material.valueOf(namespace.uppercase()))
-//        } ?: return null
+//        if (itemStack == null) return null
 //
 //        return ItemHandler.create(
 //            factoryId,
 //            namespace,
 //            itemStack,
+//            itemComponents
 //        )
 //    }
+
+    private fun create(
+        namespace: String,
+        itemComponents: List<ItemComponentHandle>
+    ): FolraItem? {
+        // var factoryId: String? = null
+        val itemStack = if (namespace.contains(":")) {
+            val id = namespace.split(":").first().uppercase()
+            // factoryId = id
+
+            val factory = FolraRegistry.ITEM_FACTORIES[id] ?: return null
+            factory.create(namespace.substring(id.length + 1))
+        } else {
+            ItemStack(Material.valueOf(namespace.uppercase()))
+        } ?: return null
+
+        return ItemHandler.create(
+            itemStack,
+            itemComponents
+        )
+    }
 }
