@@ -2,21 +2,21 @@ package com.github.grassproject.folra
 
 import com.github.grassproject.folra.api.FolraPlugin
 import com.github.grassproject.folra.api.nms.NMSHandler
-import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.item1.ItemHandler
 import com.github.grassproject.folra.test.TestCommand
 import com.github.grassproject.folra.util.version.MinecraftVersion
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 
-class Folra : FolraPlugin() {
+class BukkitFolraPlugin : FolraPlugin() {
 
     val modules = listOf(
         ItemHandler, // InventoryManager
     )
 
     companion object {
-        val INSTANCE: Folra
+        val INSTANCE: BukkitFolraPlugin
             get() {
-                return FolraPlugin.INSTANCE as Folra
+                return FolraPlugin.INSTANCE as BukkitFolraPlugin
             }
 
         lateinit var NMS_HANDLER: NMSHandler
@@ -38,10 +38,11 @@ class Folra : FolraPlugin() {
     }
 
     override fun onEnable() {
+        saveDefaultConfig()
 
-//        for (module in modules) {
-//            module.register(this)
-//        }
+        for (module in modules) {
+            module.register(this)
+        }
 
 //        event<PlayerJoinEvent> {
 //            NMS_HANDLER.registerPacketListener(it.player)
@@ -55,9 +56,9 @@ class Folra : FolraPlugin() {
     }
 
     override fun onDisable() {
-//        for (module in modules) {
-//            module.unregister(this)
-//        }
+        for (module in modules) {
+            module.unregister(this)
+        }
     }
 
     fun testPlugin() {

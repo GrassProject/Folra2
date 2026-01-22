@@ -1,0 +1,40 @@
+customfishing:bone_rod:
+  material: FISHING_ROD
+  display-name: "<bold:true><italic:false><color:#CD2626>Bone Fishing Rod</color></bold>"
+  lore:
+    - ""
+    - "<color:#7FFFD4>Desciption:</color>"
+    - "<color:gray> - Forged from the bones of age-old skeletons and</color>"
+    - "<color:gray> - imbued with dark enchantments, the Skeleton Fishing</color>"
+    - "<color:gray> - Rod is not for the faint-hearted. It allows the </color>"
+    - "<color:gray> - brave or the mad to fish within the scorching </color>"
+    - "<color:gray> - confines of lava, defying the usual limitations of</color>"
+    - "<color:gray> - regular rods.</color>"
+    - ""
+    - "<color:#FFD700>Effects:</color>"
+    - "<color:gray> - Fishing in lava</color>"
+    - "<color:gray> - Sometimes skeleton would grab the hook</color>"
+    - ""
+    - "<white>Made by Folra"
+  item-flags:
+    - HIDE_ATTRIBUTES
+bone_rod:
+  material: FISHING_ROD
+  display-name: "<bold:true><italic:false><color:#CD2626>Bone Fishing Rod</color></bold>"
+  lore:
+    - ""
+    - "<color:#7FFFD4>Desciption:</color>"
+    - "<color:gray> - Forged from the bones of age-old skeletons and</color>"
+    - "<color:gray> - imbued with dark enchantments, the Skeleton Fishing</color>"
+    - "<color:gray> - Rod is not for the faint-hearted. It allows the </color>"
+    - "<color:gray> - brave or the mad to fish within the scorching </color>"
+    - "<color:gray> - confines of lava, defying the usual limitations of</color>"
+    - "<color:gray> - regular rods.</color>"
+    - ""
+    - "<color:#FFD700>Effects:</color>"
+    - "<color:gray> - Fishing in lava</color>"
+    - "<color:gray> - Sometimes skeleton would grab the hook</color>"
+    - ""
+    - "<white>Made by Folra"
+  item-flags:
+    - HIDE_ATTRIBUTES

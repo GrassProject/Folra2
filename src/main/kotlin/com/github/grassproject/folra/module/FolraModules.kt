@@ -1,10 +1,10 @@
 package com.github.grassproject.folra.module
 
-import com.github.grassproject.folra.Folra
+import com.github.grassproject.folra.BukkitFolraPlugin
 
 interface FolraModules {
 
-    fun register(folra: Folra)
-    fun unregister(folra: Folra)
+    fun register(folra: BukkitFolraPlugin)
+    fun unregister(folra: BukkitFolraPlugin)
 
 }

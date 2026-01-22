@@ -1,10 +1,10 @@
 package com.github.grassproject.folra.registry
 
-import com.github.grassproject.folra.item.FolraItem
-import com.github.grassproject.folra.item.factory.Base64Factory
-import com.github.grassproject.folra.item.factory.CraftEngineFactory
-import com.github.grassproject.folra.item.factory.IAFactory
-import com.github.grassproject.folra.item.factory.NexoFactory
+import com.github.grassproject.folra.item1.FolraItem
+import com.github.grassproject.folra.item1.factory.Base64Factory
+import com.github.grassproject.folra.item1.factory.CraftEngineFactory
+import com.github.grassproject.folra.item1.factory.IAFactory
+import com.github.grassproject.folra.item1.factory.NexoFactory
 
 object FolraRegistry {
 

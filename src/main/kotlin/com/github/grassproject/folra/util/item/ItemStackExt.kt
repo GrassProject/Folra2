@@ -1,8 +1,7 @@
 package com.github.grassproject.folra.util.item
 
-import com.github.grassproject.folra.item.FolraItem
-import com.github.grassproject.folra.item.ItemHandler
-import net.kyori.adventure.text.Component
+import com.github.grassproject.folra.item1.FolraItem
+import com.github.grassproject.folra.item1.ItemHandler
 import org.bukkit.Material
 import org.bukkit.block.CreatureSpawner
 import org.bukkit.entity.EntityType
@@ -31,14 +30,8 @@ fun ItemMeta.setSpawnerType(type: EntityType) {
     this.blockState = blockState
 }
 
-fun ItemStack.setDisplayName(displayName: Component?) {
-    val meta = itemMeta ?: return
-    meta.displayName(displayName)
-    itemMeta = meta
-}
-
 fun Material.toCustomItem(): FolraItem {
-    return ItemHandler.create(null, null, ItemStack(this))
+    return ItemHandler.create(null, null, ItemStack(this), listOf())
 }
 
 fun ItemStack.modifyMeta(block: (ItemMeta) -> Unit): ItemStack {

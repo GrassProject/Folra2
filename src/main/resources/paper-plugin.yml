@@ -7,8 +7,8 @@ description: Plugin Framework
 load: STARTUP
 website: https://grassproject.github.io
 
-main: com.github.grassproject.folra.Folra
-loader: com.github.grassproject.folra.FolraLoader
+main: com.github.grassproject.folra.BukkitFolraPlugin
+loader: com.github.grassproject.folra.BukkitFolraLoader
 
 dependencies:
   server:

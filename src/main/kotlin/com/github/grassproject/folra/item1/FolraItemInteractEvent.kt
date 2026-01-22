@@ -1,4 +1,4 @@
-package com.github.grassproject.folra.item
+package com.github.grassproject.folra.item1
 
 import com.github.grassproject.folra.api.event.FolraEvent
 import org.bukkit.entity.Player

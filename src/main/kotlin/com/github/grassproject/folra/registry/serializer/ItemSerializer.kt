@@ -1,7 +1,8 @@
 package com.github.grassproject.folra.registry.serializer
 
-import com.github.grassproject.folra.item.FolraItem
-import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.item1.FolraItem
+import com.github.grassproject.folra.item1.ItemHandler
+import com.github.grassproject.folra.item1.component.*
 import com.github.grassproject.folra.registry.FolraRegistry
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
@@ -9,6 +10,23 @@ import org.bukkit.inventory.ItemStack
 
 object ItemSerializer {
 
+    val itemComponentsFactories = hashSetOf(
+        AmountComponent,
+        CustomModelDataComponent,
+        DamageComponent,
+        DisplayNameComponent,
+        DyeComponent,
+        EnchantsComponent,
+        FlagsComponent,
+        ItemModelComponent,
+        LoreComponent,
+        MaxDamageComponent,
+        MaxStackSizeComponent,
+        SpawnerTypeComponent,
+        TooltipStyleComponent,
+        UnbreakableComponent
+    )
+    
     inline fun <reified T : Any> fromSection(
         section: ConfigurationSection?, crossinline mapper: (ConfigurationSection, FolraItem) -> T
     ): T? {
@@ -23,10 +41,11 @@ object ItemSerializer {
         section ?: return null
         return try {
             val material = section.getString("material", "STONE")!!
-            // val options = optionFactories.mapNotNull { it.load(section) }
+            val itemComponents = itemComponentsFactories.mapNotNull { it.load(section) }
 
             return create(
                 material,
+                itemComponents
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -45,7 +64,36 @@ object ItemSerializer {
         return sections.mapNotNull { fromSection(it, mapper) }
     }
 
-//    private fun create(
+    fun createFactory(namespace: String): Pair<String?, ItemStack?> {
+        if (namespace.contains(":")) {
+            val (factoryId, itemId) = namespace.split(":", limit = 2).let {
+                it[0].uppercase() to it[1]
+            }
+
+            val factory = FolraRegistry.ITEM_FACTORIES[factoryId]
+            return factoryId to factory?.create(itemId)
+        }
+        val material = runCatching { Material.valueOf(namespace.uppercase()) }.getOrNull()
+        return null to material?.let { ItemStack(it) }
+    }
+
+    private fun create(
+        namespace: String,
+        itemComponents: List<ItemComponentHandle>
+    ): FolraItem? {
+        val (factoryId, itemStack) = createFactory(namespace)
+
+        if (itemStack == null) return null
+
+        return ItemHandler.create(
+            factoryId,
+            namespace,
+            itemStack,
+            itemComponents
+        )
+    }
+
+    //    private fun create(
 //        namespace: String,
 //    ): FolraItem? {
 //        var factoryId: String? = null
@@ -65,28 +113,4 @@ object ItemSerializer {
 //            itemStack,
 //        )
 //    }
-
-    fun createFactory(namespace: String): Pair<String?, ItemStack?> {
-        return if (namespace.contains(":")) {
-            val id = namespace.split(":").first().uppercase()
-            val factory = FolraRegistry.ITEM_FACTORIES[id]
-            id to factory?.create(namespace.substring(id.length + 1))
-        } else {
-            val material = runCatching { Material.valueOf(namespace.uppercase()) }.getOrNull()
-            null to material?.let { ItemStack(it) }
-        }
-    }
-
-    private fun create(namespace: String): FolraItem? {
-        val (factoryId, itemStack) = createFactory(namespace)
-
-        if (itemStack == null) return null
-
-        return ItemHandler.create(
-            factoryId,
-            namespace,
-            itemStack
-        )
-    }
-
 }

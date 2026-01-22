@@ -1,98 +1,86 @@
 package com.github.grassproject.folra.registry
 
-import com.github.grassproject.folra.item.FolraItem
-import com.github.grassproject.folra.item.FolraItemInteractEvent
-import com.github.grassproject.folra.item.ItemHandler
+import com.github.grassproject.folra.item1.FolraItem
+import com.github.grassproject.folra.item1.FolraItemImpl
+import com.github.grassproject.folra.item1.FolraItemInteractEvent
+import com.github.grassproject.folra.item1.ItemHandler
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-fun FolraItem.register(
-    namespace: String,
-    id: String
-): Boolean {
-    return register(
-        namespace, id,
-        registerInteraction = false
-    )
-}
+fun FolraItem.register(namespace: String, id: String): Boolean =
+    register(namespace, id, registerInteraction = false)
 
 fun FolraItem.register(
     namespace: String,
     id: String,
     interactionHandler: (FolraItemInteractEvent) -> Unit
-): Boolean {
-    return register(namespace, id, interactionHandler, true)
-}
+): Boolean = register(namespace, id, interactionHandler, true)
 
 private fun FolraItem.register(
-    namespace: String, id: String,
-    interactionHandler: (FolraItemInteractEvent) -> Unit = {}, registerInteraction: Boolean
+    namespace: String,
+    id: String,
+    interactionHandler: (FolraItemInteractEvent) -> Unit = {},
+    registerInteraction: Boolean
 ): Boolean {
-    val registryId = registryId()
+    val fullId = "$namespace:$id"
+    val id = registryId()
     val item = getUnmodifiedItem()
-    if (registryId != null && registryId != "$namespace:$id") return false
+
+    if (id != null && id != fullId) return false
 
     item.editPersistentDataContainer {
-        it.set(ItemHandler.NAMESPACE_KEY, PersistentDataType.STRING, "$namespace:$id")
+        it[ItemHandler.ITEM_KEY, PersistentDataType.STRING] = fullId
     }
 
-//    Registry.update {
-//        replaceRegistry(
-//            FolraItem.ITEM_REGISTRY_KEY
-//        ) {
-//            register("$namespace:$id", this@register)
-//        }
-//    }
-    FolraRegistry.ITEM["$namespace:$id"] = this
+    println("PDC: ${item.persistentDataContainer.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING)}")
+
+    FolraRegistry.ITEM[fullId] = this
 
     if (registerInteraction) {
-        ItemHandler.listenInteractions["$namespace:$id"] = interactionHandler
+        ItemHandler.listenInteractions[fullId] = interactionHandler
     }
+
     return true
 }
 
 fun FolraItem.setInteractionHandler(interactionHandler: (FolraItemInteractEvent) -> Unit): Boolean {
-    val registryId = registryId() ?: return false
-    ItemHandler.listenInteractions[registryId] = interactionHandler
+    val id = registryId() ?: return false
+    ItemHandler.listenInteractions[id] = interactionHandler
     return true
 }
 
 fun FolraItem.removeInteractionHandler(): Boolean {
-    val registryId = registryId() ?: return false
-    ItemHandler.listenInteractions.remove(registryId)
-    return true
+    val id = registryId() ?: return false
+    return ItemHandler.listenInteractions.remove(id) != null
 }
 
 fun FolraItem.unregister(): Boolean {
-    val registryId = registryId() ?: return false
+    val id = registryId() ?: return false
     val item = getUnmodifiedItem()
-    item.editPersistentDataContainer {
-        it.remove(ItemHandler.NAMESPACE_KEY)
+
+    item.editMeta {
+        it.persistentDataContainer.remove(ItemHandler.ITEM_KEY)
     }
 
-//    var found = false
-//    Registry.update {
-//        replaceRegistry(
-//            FolraItem.ITEM_REGISTRY_KEY
-//        ) {
-//            if (unregister(registryId) != null) found = true
-//        }
-//    }
-//    if (!found) return false
-
-    FolraRegistry.ITEM.remove(registryId)
-    ItemHandler.listenInteractions.remove(registryId)
-    return true
+    val removed = FolraRegistry.ITEM.remove(id)
+    ItemHandler.listenInteractions.remove(id)
+    return removed != null
 }
 
 fun FolraItem.registryId(): String? {
-    val pdc = getUnmodifiedItem().persistentDataContainer
-    return pdc.get(ItemHandler.NAMESPACE_KEY, PersistentDataType.STRING)
+//    val pdc = getUnmodifiedItem().persistentDataContainer
+//    println(pdc.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING))
+//    return pdc.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING)
+    val meta = getUnmodifiedItem().itemMeta
+    val pdc = meta?.persistentDataContainer ?: return null
+    println(pdc.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING))
+    println(getUnmodifiedItem().persistentDataContainer.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING))
+    return pdc.get(ItemHandler.ITEM_KEY, PersistentDataType.STRING)
 }
 
 fun ItemStack.toFolraItem(): FolraItem? {
     val pdc = persistentDataContainer
-    val namespacedKey = ItemHandler.NAMESPACE_KEY
+    val namespacedKey = ItemHandler.ITEM_KEY
     if (!pdc.has(namespacedKey, PersistentDataType.STRING)) return null
     val id = pdc.get(namespacedKey, PersistentDataType.STRING) ?: return null
     return FolraRegistry.ITEM[id]
